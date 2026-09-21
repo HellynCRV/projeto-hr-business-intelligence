@@ -228,3 +228,9 @@ Dados prontos para análise exploratória em Python.
 - A importância de relacionar múltiplas tabelas para enriquecer a análise com informações geográficas.  
 - O uso de `LEFT JOIN` garantiu que todos os funcionários fossem incluídos, mesmo que alguns não tenham localização detalhada.  
 - O filtro `WHERE r.region_name IS NOT NULL` assegurou consistência nos dados exportados.
+
+## 21/09/2026 – Desenvolvimento da Query 3 (Funcionários por Cargo e Faixa Salarial)
+### Aprendizados
+- O uso de `CASE WHEN` permitiu agrupar salários em faixas, facilitando a análise da distribuição salarial.
+- A junção com a tabela `HR.JOBS` trouxe insights sobre como diferentes cargos se concentram em determinadas faixas de remuneração.
+- A ordenação por cargo e faixa salarial deixou os resultados mais organizados e claros para interpretação.
