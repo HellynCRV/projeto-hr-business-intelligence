@@ -1,0 +1,260 @@
+# Diário de Desenvolvimento — Projeto HR BI
+
+Este documento registra o processo de desenvolvimento do projeto,
+incluindo decisões técnicas, problemas encontrados, soluções adotadas
+e aprendizados obtidos durante a construção da solução de Business
+Intelligence aplicada à área de Recursos Humanos.
+
+---
+
+## 18/09/2026 — Desenvolvimento da Query 1 (Salários por Departamento e Cargo)
+### Objetivo
+Construir a primeira consulta SQL solicitada no projeto, analisando a distribuição de salários por departamento e cargo.
+
+### Atividades realizadas
+Acesso ao banco FreeSQL (schema HR).
+
+Criação da consulta query_1.sql utilizando LEFT JOIN entre as tabelas EMPLOYEES, DEPARTMENTS e JOBS.
+
+Aplicação de filtro simples com WHERE SALARY > 0 para garantir consistência dos dados.
+
+Execução da query e validação dos resultados.
+
+Exportação do resultado para o arquivo dados/query_01.csv.
+
+Estrutura da Query
+sql
+SELECT 
+    e.employee_id,
+    e.first_name,
+    e.last_name,
+    e.salary,
+    d.department_name,
+    j.job_title
+FROM hr.employees e
+LEFT JOIN hr.departments d ON e.department_id = d.department_id
+LEFT JOIN hr.jobs j ON e.job_id = j.job_id
+WHERE e.salary > 0;
+### Resultado
+Arquivo query_01.csv gerado com 58 registros e 6 colunas.
+
+Dados prontos para serem utilizados na análise exploratória em Python.
+
+### Aprendizados
+A importância de validar a query com filtros simples para evitar registros inconsistentes.
+
+O uso de LEFT JOIN garantiu que todos os funcionários fossem incluídos, mesmo que alguns não tivessem departamento ou cargo associado.
+
+## 21/09/2026 — Configuração inicial do projeto
+
+### Objetivo
+
+Preparar o ambiente de desenvolvimento para iniciar a análise
+dos dados de Recursos Humanos utilizando Python e Pandas.
+
+### Atividades realizadas
+
+- Estruturação inicial do projeto `Projeto_HR_BI`.
+- Criação do ambiente virtual `.venv`.
+- Ativação do ambiente virtual.
+- Instalação da biblioteca Pandas.
+- Criação do script `src/analisar_dados.py`.
+- Identificação do arquivo de dados `dados/query_01.csv`.
+
+### Ambiente utilizado
+
+- Python
+- Pandas
+- Visual Studio Code
+- PowerShell
+- Ambiente virtual Python (`.venv`)
+
+---
+
+## 21/09/2026 — Primeiro teste de leitura dos dados
+
+### Objetivo
+
+Realizar a leitura do arquivo CSV utilizando o Pandas e verificar
+sua estrutura.
+
+Foi utilizado inicialmente:
+
+```python
+df = pd.read_csv(arquivo)
+
+Resultado inicial
+O arquivo foi carregado, porém os dados não foram interpretados
+corretamente.
+
+O resultado apresentado foi:
+
+58 linhas;
+
+58 colunas identificadas pelo código;
+
+apenas uma coluna aparecia na lista de nomes das colunas.
+
+A saída indicava:
+
+['EMPLOYEE_ID,"FIRST_NAME","LAST_NAME","SALARY","DEPARTMENT_NAME","JOB_TITLE"']
+
+Problema identificado
+Os dados deveriam possuir seis campos:
+
+EMPLOYEE_ID
+
+FIRST_NAME
+
+LAST_NAME
+
+SALARY
+
+DEPARTMENT_NAME
+
+JOB_TITLE
+
+Porém, o Pandas estava interpretando cada linha de forma incorreta.
+
+Investigação da estrutura do CSV
+Com a ajuda da IA, foi utilizado o comando:
+
+Get-Content dados\query_01.csv -TotalCount 2
+
+Resultado
+Foi identificada uma estrutura de aspas diferente do formato CSV
+convencional.
+
+Exemplo encontrado:
+
+"EMPLOYEE_ID,""FIRST_NAME"",""LAST_NAME"",""SALARY"",""DEPARTMENT_NAME"",""JOB_TITLE"""
+
+Também foi identificado que os campos estavam separados por vírgulas.
+
+Conclusão
+O problema estava relacionado à formatação do arquivo de origem,
+principalmente à forma como as aspas estavam estruturadas.
+
+Tratamento da leitura do CSV
+Objetivo
+Corrigir a interpretação dos dados antes de iniciar a análise.
+
+Foi utilizado o separador explícito:
+
+pd.read_csv(arquivo, sep=",")
+
+Porém, apenas informar o separador não era suficiente para corrigir
+completamente a estrutura das aspas do arquivo.
+
+Foi então realizado um tratamento das linhas antes da criação do
+DataFrame.
+
+O tratamento:
+
+lê as linhas do arquivo;
+
+remove as aspas externas;
+
+corrige as aspas duplicadas;
+
+reconstrói o conteúdo;
+
+utiliza o Pandas para criar o DataFrame.
+
+Solução implementada
+with open(arquivo, "r", encoding="utf-8") as f:
+    linhas = f.readlines()
+
+linhas_corrigidas = []
+
+for linha in linhas:
+    linha = linha.strip()
+
+    if linha.startswith('"') and linha.endswith('"'):
+        linha = linha[1:-1]
+
+    linha = linha.replace('""', '"')
+
+    linhas_corrigidas.append(linha)
+
+Depois:
+
+df = pd.read_csv(StringIO("\n".join(linhas_corrigidas)))
+
+Validação da estrutura dos dados
+Após o tratamento, o DataFrame passou a apresentar a estrutura
+esperada.
+
+Resultado
+Quantidade de linhas: 58
+Quantidade de colunas: 6
+
+As colunas identificadas foram:
+
+EMPLOYEE_ID
+FIRST_NAME
+LAST_NAME
+SALARY
+DEPARTMENT_NAME
+JOB_TITLE
+
+Também foi realizada uma correção no código responsável por
+contabilizar as colunas.
+
+Inicialmente havia:
+
+len(df)
+
+Para quantidade de colunas, o correto é:
+
+len(df.columns)
+
+Resultado final da validação
+Quantidade de linhas: 58
+Quantidade de colunas: 6
+
+O Pandas também confirmou:
+
+[5 rows x 6 columns]
+
+Situação atual
+A etapa de carregamento e validação inicial dos dados foi concluída.
+
+O conjunto possui:
+
+58 registros;
+
+6 atributos;
+
+identificação do funcionário;
+
+nome e sobrenome;
+
+salário;
+
+departamento;
+
+cargo.
+
+Aprendizados desta etapa
+Durante a configuração inicial, foi possível identificar a importância
+de verificar a estrutura real dos dados antes de iniciar uma análise.
+
+O problema inicialmente poderia parecer relacionado ao Pandas ou ao
+separador utilizado, mas a inspeção direta do arquivo permitiu
+identificar que a origem estava na formatação do CSV.
+
+Também foi reforçada a importância de validar o DataFrame após a
+importação, verificando:
+
+quantidade de registros;
+
+quantidade de colunas;
+
+nomes das colunas;
+
+primeiras linhas dos dados.
+
+Essa validação evita iniciar análises sobre uma estrutura de dados
+incorreta.
+
