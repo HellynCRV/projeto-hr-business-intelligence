@@ -217,5 +217,5 @@ Nomes das colunas
 
 Primeiras linhas dos dados
 
-Essa validação evita iniciar análises sobre uma estrutura incorreta.
+Essa validação evita iniciar análises sobre uma estrutura de dados incorreta.
 
