@@ -232,3 +232,110 @@ plt.savefig("graficos/query2_localizacoes.png")
 
 # Fechando o gráfico depois de salvá-lo.
 plt.close()
+
+# --- Query 3: Limpeza ---
+
+# Fazendo a leitura do arquivo CSV original da Query 3.
+# Utilizando o header=None para que a primeira linha não seja interpretada automaticamente como nome das colunas.
+df3_raw = pd.read_csv("dados/query_03.csv", header=None)
+
+# Separando os valores utilizando a vírgula como delimitador.
+# Utilizando o expand=True para transformar os valores separados em diferentes colunas.
+df3 = df3_raw[0].str.split(",", expand=True)
+
+
+# --- Verificação dos dados antes da limpeza ---
+
+# Verificando as primeiras linhas do DataFrame. 
+print("\nPreview Query 3 antes da limpeza:")
+print(df3.head())
+
+# Verificando quantas colunas foram encontradas depois da separação.
+# O shape[1] representa a quantidade de colunas do DataFrame.
+
+print("Número de colunas:", df3.shape[1])
+
+
+# --- Definição dos nomes das colunas ---
+
+# Depois de verificar que o arquivo possui 3 colunas, defino nomes para cada uma delas.
+#
+# DEPARTMENT_ID = identificador do departamento
+# DEPARTMENT_NAME = nome do departamento
+# LOCATION_ID = identificador da localização
+df3.columns = [
+    "DEPARTMENT_ID",
+    "DEPARTMENT_NAME",
+    "LOCATION_ID"
+]
+
+
+# --- Remoção das aspas ---
+
+# Percorrendo todas as colunas do DataFrame e removendo as aspas duplas que vieram junto com os valores do arquivo CSV.
+for col in df3.columns:
+    df3[col] = df3[col].str.strip('"')
+
+
+# --- Remoção do cabeçalho original ---
+
+# Removendo a primeira linha do DataFrame.
+df3 = df3.drop(0)
+
+
+# --- Salvamento dos dados limpos ---
+
+# Salvando o DataFrame já tratado em um novo arquivo CSV.
+# Utilizando o index=False para evitar que o índice do DataFrame seja salvo como uma coluna adicional no arquivo.
+df3.to_csv("dados/query_03_limpo.csv", index=False)
+
+# Exibindo uma mensagem para confirmar que o arquivo limpo foi salvo corretamente.
+print("\nArquivo limpo salvo em dados/query_03_limpo.csv")
+
+
+# --- Query 3: EDA ---
+
+# Lendo o arquivo já limpo para iniciar a análise exploratória dos dados.
+df3 = pd.read_csv("dados/query_03_limpo.csv")
+
+
+# --- Análise dos departamentos ---
+
+# Contando quantos registros existem para cada departamento utilizando o value_counts().
+print("\nDepartamentos e suas localizações:")
+print(df3["DEPARTMENT_NAME"].value_counts())
+
+
+# --- Gráfico de frequência dos departamentos ---
+
+# Criando um gráfico de barras mostrando a quantidade de registros de cada departamento.
+#
+# kind="bar" define o tipo do gráfico como barras.
+# color define a cor das barras.
+# edgecolor define a cor das bordas das barras.
+df3["DEPARTMENT_NAME"].value_counts().plot(
+    kind="bar",
+    color="orange",
+    edgecolor="black"
+)
+
+# Definindo o título do gráfico.
+plt.title("Departamentos - Frequência")
+
+# Definindo o nome do eixo X.
+plt.xlabel("Departamento")
+
+# Definindo o nome do eixo Y.
+plt.ylabel("Número de Registros")
+
+# Girando os nomes dos departamentos em 45 graus para facilitar a leitura do gráfico.
+plt.xticks(rotation=45)
+
+# Ajustando automaticamente os espaços do gráfico para evitar que os textos fiquem cortados.
+plt.tight_layout()
+
+# Salvando o gráfico como uma imagem PNG.
+plt.savefig("graficos/query3_departamentos.png")
+
+# Fechando o gráfico depois de salvá-lo.
+plt.close()
