@@ -41,3 +41,88 @@ df.to_csv("dados/query_01_limpo.csv", index=False)
 
 # Exibindo uma mensagem no terminal informando que o arquivo foi salvo.
 print("\nArquivo limpo salvo em dados/query_01_limpo.csv")
+
+# --- Query 1: EDA ---
+
+# Lendo o arquivo que foi gerado na etapa de limpeza e utilizando o arquivo já tratado para fazer a análise dos dados.
+df = pd.read_csv("dados/query_01_limpo.csv")
+
+
+# --- Estatísticas dos salários ---
+
+# Calculando a média salarial de todos os funcionários.
+print("Média salarial:", df["SALARY"].mean())
+
+# Calculando a mediana salarial.
+print("Mediana salarial:", df["SALARY"].median())
+
+# Identificando o menor salário presente no conjunto de dados.
+print("Menor salário:", df["SALARY"].min())
+
+# Identificando o maior salário presente no conjunto de dados.
+print("Maior salário:", df["SALARY"].max())
+
+
+# --- Quantidade de funcionários por departamento ---
+
+# Contando quantos funcionários existem em cada departamento.
+# O value_counts() contabiliza a quantidade de ocorrências de cada valor na coluna DEPARTMENT_NAME.
+print("\nFuncionários por departamento:")
+print(df["DEPARTMENT_NAME"].value_counts())
+
+
+# --- Histograma dos salários ---
+
+# Criando um histograma para visualizar como os salários estão distribuídos.
+#
+# bins=10 significa que os salários serão divididos em 10 intervalos.
+# color define a cor das barras.
+# edgecolor define a cor das bordas das barras.
+plt.hist(
+    df["SALARY"],
+    bins=10,
+    color="lightblue",
+    edgecolor="black"
+)
+
+# Definindo o título do gráfico.
+plt.title("Distribuição de Salários")
+
+# Definindo o nome do eixo X.
+plt.xlabel("Faixa Salarial")
+
+# Definindo o nome do eixo Y.
+# O eixo Y representa a quantidade de funcionários em cada faixa salarial.
+plt.ylabel("Número de Funcionários")
+
+# Com ajuda da IA, salvei o histograma como uma imagem PNG.
+# Isso permite utilizar o gráfico posteriormente no trabalho sem precisar gerar o gráfico novamente.
+plt.savefig("graficos/query1_salarios_histograma.png")
+
+# Com a ajuda da IA, fecho o gráfico atual para liberar memória e evitar que ele seja reutilizado junto com o próximo gráfico.
+plt.close()
+
+
+# --- Boxplot dos salários por departamento ---
+
+# Criando um boxplot para comparar a distribuição dos salários entre os diferentes departamentos.
+#
+df.boxplot(
+    column="SALARY",
+    by="DEPARTMENT_NAME",
+    rot=45
+)
+
+# Definindo o título principal do gráfico.
+plt.title("Salários por Departamento")
+
+# O pandas cria automaticamente um segundo título relacionado ao agrupamento utilizado no boxplot.
+# Com a ajuda da IA, removo esse título para deixar o gráfico mais limpo.
+
+plt.suptitle("")
+
+# Salvando o boxplot como uma imagem PNG.
+plt.savefig("graficos/query1_salarios_boxplot.png")
+
+# Fechando o gráfico depois de salvá-lo.
+plt.close()
