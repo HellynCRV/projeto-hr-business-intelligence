@@ -40,7 +40,7 @@ Dados prontos para serem utilizados na análise exploratória em Python.
 - A importância de validar a query com filtros simples para evitar registros inconsistentes.  
 - O uso de `LEFT JOIN` garantiu que todos os funcionários fossem incluídos, mesmo que alguns não tivessem departamento ou cargo associado.
 
-Observação adicional:  
+### Observação adicional:  
 Durante os testes iniciais, também foi utilizada a condição WHERE SALARY > 5000 ORDER BY SALARY DESC para explorar apenas os salários mais altos. Essa variação ajudou a entender melhor a distribuição dos maiores salários, mas não corresponde ao escopo oficial da Query 1.
 A versão final entregue segue o enunciado do projeto, utilizando WHERE SALARY > 0 para representar a distribuição completa dos salários por departamento e cargo, garantindo consistência nos dados exportados para o arquivo query_01.csv.
 ---
