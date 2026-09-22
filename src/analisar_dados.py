@@ -126,3 +126,109 @@ plt.savefig("graficos/query1_salarios_boxplot.png")
 
 # Fechando o gráfico depois de salvá-lo.
 plt.close()
+
+# --- Query 2: Limpeza ---
+
+# Fazendo a leitura do arquivo CSV original da Query 2.
+# Usando o header=None faz para que nenhuma linha seja considerada automaticamente como cabeçalho.
+df2_raw = pd.read_csv("dados/query_02.csv", header=None)
+
+# Separando os dados usando a vírgula como delimitador.
+# Transformando os valores separados, em várias colunas com expand=True.
+df2 = df2_raw[0].str.split(",", expand=True)
+
+
+# --- Verificação dos dados antes da limpeza ---
+
+# Antes de continuar a limpeza, faço uma visualização das primeiras linhas do DataFrame para verificar como os dados foram separados.
+print("\nPreview Query 2 antes da limpeza:")
+print(df2.head())
+
+
+# --- Definição dos nomes das colunas ---
+
+# Depois de verificar a estrutura dos dados, atribuo nomes às colunas.
+# Neste arquivo existem 9 colunas relacionadas às localizações.
+df2.columns = [
+    "LOCATION_ID",
+    "STREET_ADDRESS",
+    "POSTAL_CODE",
+    "CITY",
+    "STATE_PROVINCE",
+    "COUNTRY_ID",
+    "REGION_ID",
+    "REGION_NAME",
+    "LOCATION_NAME"
+]
+
+
+# --- Remoção das aspas ---
+
+# Percorro todas as colunas do DataFrame. Em cada coluna, removo as aspas duplas que vieram junto com os valores do arquivo CSV.
+for col in df2.columns:
+    df2[col] = df2[col].str.strip('"')
+
+
+# --- Remoção do cabeçalho original ---
+
+# Removendo a primeira linha do DataFrame.
+df2 = df2.drop(0)
+
+
+# --- Salvamento do arquivo limpo ---
+
+# Depois de realizar a limpeza, salvo os dados em um novo arquivo CSV.
+# Utilizei o parâmetro index=False para impeder que o índice do DataFrame seja salvo como uma coluna adicional no arquivo.
+df2.to_csv("dados/query_02_limpo.csv", index=False)
+
+# Mostro uma mensagem no terminal para confirmar que o arquivo foi salvo corretamente.
+print("\nArquivo limpo salvo em dados/query_02_limpo.csv")
+
+
+# --- Query 2: EDA ---
+
+# Abrindo o arquivo já limpo para iniciar a análise exploratória dos dados.
+df2 = pd.read_csv("dados/query_02_limpo.csv")
+
+
+# --- Análise das localizações ---
+
+# Conto quantos registros existem para cada localização.
+# O value_counts() contabiliza quantas vezes cada localização aparece na coluna LOCATION_NAME.
+print("\nFuncionários por localização:")
+print(df2["LOCATION_NAME"].value_counts())
+
+
+# --- Gráfico de funcionários por localização ---
+
+# Criando um gráfico de barras com a quantidade de registros existente em cada localização.
+#
+# kind="bar" define que o gráfico será de barras.
+# color define a cor das barras.
+# edgecolor define a cor das bordas das barras.
+df2["LOCATION_NAME"].value_counts().plot(
+    kind="bar",
+    color="lightgreen",
+    edgecolor="black"
+)
+
+# Definindo o título do gráfico.
+plt.title("Funcionários por Localização")
+
+# Definindo o nome do eixo X.
+plt.xlabel("Localização")
+
+# Definindo o nome do eixo Y.
+plt.ylabel("Número de Funcionários")
+
+# Com ajuda da IA, girei os nomes das localizações em 45 graus, para facilitar a leitura.
+plt.xticks(rotation=45)
+
+# Com ajuda da IA, ajusto automaticamente os espaços do gráfico para evitar que os textos fiquem cortados.
+plt.tight_layout()
+
+# Salvando o gráfico em formato PNG na pasta de gráficos.
+plt.savefig("graficos/query2_localizacoes.png")
+
+# Fechando o gráfico depois de salvá-lo.
+plt.close()
