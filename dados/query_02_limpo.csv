@@ -1,4 +1,4 @@
-LOCATION_ID,STREET_ADDRESS,POSTAL_CODE,CITY,STATE_PROVINCE,COUNTRY_ID,REGION_ID,REGION_NAME,LOCATION_NAME
+EMPLOYEE_ID,FIRST_NAME,LAST_NAME,SALARY,DEPARTMENT_NAME,CITY,STATE_PROVINCE,COUNTRY_NAME,REGION_NAME
 100,Steven,King,24000,Executive,Seattle,Washington,United States of America,Americas
 101,Neena,Yang,17000,Executive,Seattle,Washington,United States of America,Americas
 102,Lex,Garcia,17000,Executive,Seattle,Washington,United States of America,Americas

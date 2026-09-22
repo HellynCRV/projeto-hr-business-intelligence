@@ -127,215 +127,275 @@ plt.savefig("graficos/query1_salarios_boxplot.png")
 # Fechando o gráfico depois de salvá-lo.
 plt.close()
 
+# ============================================================
+# QUERY 2 - FUNCIONÁRIOS POR REGIÃO
+# ============================================================
+
+
 # --- Query 2: Limpeza ---
 
 # Fazendo a leitura do arquivo CSV original da Query 2.
-# Usando o header=None faz para que nenhuma linha seja considerada automaticamente como cabeçalho.
+# Usando header=None para que nenhuma linha seja considerada
+# automaticamente como cabeçalho.
+
 df2_raw = pd.read_csv("dados/query_02.csv", header=None)
 
+
 # Separando os dados usando a vírgula como delimitador.
-# Transformando os valores separados, em várias colunas com expand=True.
+# O expand=True transforma os valores separados em várias colunas.
+
 df2 = df2_raw[0].str.split(",", expand=True)
 
 
 # --- Verificação dos dados antes da limpeza ---
 
-# Antes de continuar a limpeza, faço uma visualização das primeiras linhas do DataFrame para verificar como os dados foram separados.
+# Antes de continuar a limpeza, faço uma visualização das primeiras
+# linhas do DataFrame para verificar como os dados foram separados.
+
 print("\nPreview Query 2 antes da limpeza:")
+
 print(df2.head())
 
 
 # --- Definição dos nomes das colunas ---
 
 # Depois de verificar a estrutura dos dados, atribuo nomes às colunas.
-# Neste arquivo existem 9 colunas relacionadas às localizações.
+# O resultado da Query 2 possui 9 colunas, reunindo informações
+# dos funcionários, departamentos e localização geográfica.
+
 df2.columns = [
-    "LOCATION_ID",
-    "STREET_ADDRESS",
-    "POSTAL_CODE",
+    "EMPLOYEE_ID",
+    "FIRST_NAME",
+    "LAST_NAME",
+    "SALARY",
+    "DEPARTMENT_NAME",
     "CITY",
     "STATE_PROVINCE",
-    "COUNTRY_ID",
-    "REGION_ID",
-    "REGION_NAME",
-    "LOCATION_NAME"
+    "COUNTRY_NAME",
+    "REGION_NAME"
 ]
 
 
 # --- Remoção das aspas ---
 
-# Percorro todas as colunas do DataFrame. Em cada coluna, removo as aspas duplas que vieram junto com os valores do arquivo CSV.
+# Percorro todas as colunas do DataFrame.
+# Em cada coluna, removo as aspas duplas que vieram junto
+# com os valores do arquivo CSV.
+
 for col in df2.columns:
     df2[col] = df2[col].str.strip('"')
 
 
 # --- Remoção do cabeçalho original ---
 
-# Removendo a primeira linha do DataFrame.
+# Removendo a primeira linha do DataFrame, que corresponde
+# ao cabeçalho original exportado junto com os dados.
+
 df2 = df2.drop(0)
 
 
 # --- Salvamento do arquivo limpo ---
 
 # Depois de realizar a limpeza, salvo os dados em um novo arquivo CSV.
-# Utilizei o parâmetro index=False para impeder que o índice do DataFrame seja salvo como uma coluna adicional no arquivo.
+# O parâmetro index=False impede que o índice do DataFrame
+# seja salvo como uma coluna adicional.
+
 df2.to_csv("dados/query_02_limpo.csv", index=False)
 
-# Mostro uma mensagem no terminal para confirmar que o arquivo foi salvo corretamente.
+# Mostro uma mensagem no terminal para confirmar
+# que o arquivo foi salvo corretamente.
+
 print("\nArquivo limpo salvo em dados/query_02_limpo.csv")
 
 
 # --- Query 2: EDA ---
 
-# Abrindo o arquivo já limpo para iniciar a análise exploratória dos dados.
+# Abrindo o arquivo já limpo para iniciar a análise exploratória
+# dos dados.
+
 df2 = pd.read_csv("dados/query_02_limpo.csv")
 
 
-# --- Análise das localizações ---
+# --- Análise das regiões ---
 
-# Conto quantos registros existem para cada localização.
-# O value_counts() contabiliza quantas vezes cada localização aparece na coluna LOCATION_NAME.
-print("\nFuncionários por localização:")
-print(df2["LOCATION_NAME"].value_counts())
+# Conto quantos funcionários existem em cada região.
+# O value_counts() contabiliza a quantidade de registros
+# para cada valor da coluna REGION_NAME.
+
+print("\nFuncionários por região:")
+
+print(df2["REGION_NAME"].value_counts())
 
 
-# --- Gráfico de funcionários por localização ---
+# --- Gráfico de funcionários por região ---
 
-# Criando um gráfico de barras com a quantidade de registros existente em cada localização.
-#
-# kind="bar" define que o gráfico será de barras.
-# color define a cor das barras.
-# edgecolor define a cor das bordas das barras.
-df2["LOCATION_NAME"].value_counts().plot(
-    kind="bar",
-    color="lightgreen",
-    edgecolor="black"
-)
+plt.figure(figsize=(8, 5))
 
-# Definindo o título do gráfico.
-plt.title("Funcionários por Localização")
+df2["REGION_NAME"].value_counts().plot(kind="bar")
 
-# Definindo o nome do eixo X.
-plt.xlabel("Localização")
+plt.title("Funcionários por Região")
+plt.xlabel("Região")
+plt.ylabel("Total de Funcionários")
+plt.xticks(rotation=0)
 
-# Definindo o nome do eixo Y.
-plt.ylabel("Número de Funcionários")
-
-# Com ajuda da IA, girei os nomes das localizações em 45 graus, para facilitar a leitura.
-plt.xticks(rotation=45)
-
-# Com ajuda da IA, ajusto automaticamente os espaços do gráfico para evitar que os textos fiquem cortados.
 plt.tight_layout()
 
-# Salvando o gráfico em formato PNG na pasta de gráficos.
-plt.savefig("graficos/query2_localizacoes.png")
+plt.savefig("graficos/query2_regioes.png", dpi=300)
 
-# Fechando o gráfico depois de salvá-lo.
 plt.close()
 
-# --- Query 3: Limpeza ---
+# --- Query 3: Funcionários por Cargo e Faixa Salarial ---
+# --- Leitura do arquivo CSV ---
 
-# Fazendo a leitura do arquivo CSV original da Query 3.
-# Utilizando o header=None para que a primeira linha não seja interpretada automaticamente como nome das colunas.
-df3_raw = pd.read_csv("dados/query_03.csv", header=None)
+df3_raw = pd.read_csv(
+    "dados/query_03.csv",
+    header=None
+)
 
-# Separando os valores utilizando a vírgula como delimitador.
-# Utilizando o expand=True para transformar os valores separados em diferentes colunas.
+print("\nPreview Query 3 antes da limpeza:")
+print(df3_raw.head())
+
+print("Número de colunas:", df3_raw.shape[1])
+
+# --- Separação das colunas ---
+# O resultado da Query 3 possui 3 colunas:
+# 1. JOB_TITLE
+# 2. FAIXA_SALARIAL
+# 3. TOTAL_FUNCIONARIOS
+
 df3 = df3_raw[0].str.split(",", expand=True)
 
-
-# --- Verificação dos dados antes da limpeza ---
-
-# Verificando as primeiras linhas do DataFrame. 
-print("\nPreview Query 3 antes da limpeza:")
-print(df3.head())
-
-# Verificando quantas colunas foram encontradas depois da separação.
-# O shape[1] representa a quantidade de colunas do DataFrame.
-
-print("Número de colunas:", df3.shape[1])
-
-
-# --- Definição dos nomes das colunas ---
-
-# Depois de verificar que o arquivo possui 3 colunas, defino nomes para cada uma delas.
-#
-# DEPARTMENT_ID = identificador do departamento
-# DEPARTMENT_NAME = nome do departamento
-# LOCATION_ID = identificador da localização
 df3.columns = [
-    "DEPARTMENT_ID",
-    "DEPARTMENT_NAME",
-    "LOCATION_ID"
+    "JOB_TITLE",
+    "FAIXA_SALARIAL",
+    "TOTAL_FUNCIONARIOS"
 ]
 
+# --- Limpeza dos dados ---
+# Removendo espaços e aspas das colunas de texto
+for col in ["JOB_TITLE", "FAIXA_SALARIAL"]:
+    df3[col] = (
+        df3[col]
+        .astype(str)
+        .str.strip()
+        .str.strip('"')
+    )
 
-# --- Remoção das aspas ---
+# Removendo aspas e converte a quantidade de funcionários para número
+df3["TOTAL_FUNCIONARIOS"] = (
+    df3["TOTAL_FUNCIONARIOS"]
+    .astype(str)
+    .str.strip()
+    .str.strip('"')
+)
 
-# Percorrendo todas as colunas do DataFrame e removendo as aspas duplas que vieram junto com os valores do arquivo CSV.
-for col in df3.columns:
-    df3[col] = df3[col].str.strip('"')
+df3["TOTAL_FUNCIONARIOS"] = pd.to_numeric(
+    df3["TOTAL_FUNCIONARIOS"],
+    errors="coerce"
+)
 
 
-# --- Remoção do cabeçalho original ---
 
-# Removendo a primeira linha do DataFrame.
-df3 = df3.drop(0)
+# --- Removendo o cabeçalho ---
+# Se o CSV possui a primeira linha como cabeçalho, removemos essa linha depois de definir as colunas.
 
+df3 = df3.iloc[1:].reset_index(drop=True)
 
-# --- Salvamento dos dados limpos ---
+# --- Remoção de possíveis valores nulos ---
+df3 = df3.dropna(
+    subset=[
+        "JOB_TITLE",
+        "FAIXA_SALARIAL",
+        "TOTAL_FUNCIONARIOS"
+    ]
+)
+# --- Salvamento do arquivo limpo ---
+df3.to_csv(
+    "dados/query_03_limpo.csv",
+    index=False
+)
 
-# Salvando o DataFrame já tratado em um novo arquivo CSV.
-# Utilizando o index=False para evitar que o índice do DataFrame seja salvo como uma coluna adicional no arquivo.
-df3.to_csv("dados/query_03_limpo.csv", index=False)
-
-# Exibindo uma mensagem para confirmar que o arquivo limpo foi salvo corretamente.
-print("\nArquivo limpo salvo em dados/query_03_limpo.csv")
+print("\nArquivo limpo salvo em:")
+print("dados/query_03_limpo.csv")
 
 
 # --- Query 3: EDA ---
+print("\nDados da Query 3:")
+print(df3)
 
-# Lendo o arquivo já limpo para iniciar a análise exploratória dos dados.
-df3 = pd.read_csv("dados/query_03_limpo.csv")
-
-
-# --- Análise dos departamentos ---
-
-# Contando quantos registros existem para cada departamento utilizando o value_counts().
-print("\nDepartamentos e suas localizações:")
-print(df3["DEPARTMENT_NAME"].value_counts())
+print("\nInformações do DataFrame:")
+print(df3.info())
 
 
-# --- Gráfico de frequência dos departamentos ---
+# --- Funcionários por cargo ---
+print("\nTotal de funcionários por cargo:")
 
-# Criando um gráfico de barras mostrando a quantidade de registros de cada departamento.
-#
-# kind="bar" define o tipo do gráfico como barras.
-# color define a cor das barras.
-# edgecolor define a cor das bordas das barras.
-df3["DEPARTMENT_NAME"].value_counts().plot(
-    kind="bar",
-    color="orange",
-    edgecolor="black"
+funcionarios_por_cargo = (
+    df3.groupby("JOB_TITLE")["TOTAL_FUNCIONARIOS"]
+    .sum()
+    .sort_values(ascending=False)
 )
 
-# Definindo o título do gráfico.
-plt.title("Departamentos - Frequência")
+print(funcionarios_por_cargo)
 
-# Definindo o nome do eixo X.
-plt.xlabel("Departamento")
 
-# Definindo o nome do eixo Y.
-plt.ylabel("Número de Registros")
+# --- Funcionários por faixa salarial ---
+print("\nTotal de funcionários por faixa salarial:")
 
-# Girando os nomes dos departamentos em 45 graus para facilitar a leitura do gráfico.
-plt.xticks(rotation=45)
+funcionarios_por_faixa = (
+    df3.groupby("FAIXA_SALARIAL")["TOTAL_FUNCIONARIOS"]
+    .sum()
+)
 
-# Ajustando automaticamente os espaços do gráfico para evitar que os textos fiquem cortados.
+print(funcionarios_por_faixa)
+
+# --- Gráfico ---
+# Organizando as faixas salariais na ordem desejada
+
+ordem_faixas = [
+    "Até 3k",
+    "3k - 6k",
+    "6k - 10k",
+    "Acima de 10k"
+]
+
+# --- Tabela para o gráfico ---
+grafico = df3.pivot_table(
+    index="JOB_TITLE",
+    columns="FAIXA_SALARIAL",
+    values="TOTAL_FUNCIONARIOS",
+    aggfunc="sum",
+    fill_value=0
+)
+
+# Mantém somente as faixas existentes no arquivo
+faixas_existentes = [
+    faixa for faixa in ordem_faixas
+    if faixa in grafico.columns
+]
+
+grafico = grafico[faixas_existentes]
+
+
+# --- Criando gráfico de barras agrupadas ---
+grafico.plot(
+    kind="bar",
+    figsize=(12, 6)
+)
+
+plt.title("Funcionários por Cargo e Faixa Salarial")
+plt.xlabel("Cargo")
+plt.ylabel("Total de Funcionários")
+plt.xticks(rotation=45, ha="right")
+plt.legend(title="Faixa Salarial")
+
 plt.tight_layout()
 
-# Salvando o gráfico como uma imagem PNG.
-plt.savefig("graficos/query3_departamentos.png")
+plt.savefig(
+    "graficos/query3_funcionarios_cargo_faixa.png",
+    dpi=300
+)
 
-# Fechando o gráfico depois de salvá-lo.
 plt.close()
+
+
