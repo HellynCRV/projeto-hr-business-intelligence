@@ -1,34 +1,43 @@
 import pandas as pd
-from io import StringIO
+import matplotlib.pyplot as plt
 
-arquivo = "dados/query_01.csv"
+# --- Query 1: Limpeza ---
 
-# Corrige a formatação do CSV
-with open(arquivo, "r", encoding="utf-8") as f:
-    linhas = f.readlines()
+# Fazendo a leitura do arquivo CSV original.
+# O header=None é usado, pois a primeira linha do arquivo não deve ser tratada como nome das colunas.
+df_raw = pd.read_csv("dados/query_01.csv", header=None)
 
-linhas_corrigidas = []
+# O arquivo foi lido inicialmente como uma única coluna.
+# Aqui separo os valores dessa coluna usando a vírgula como delimitador.
+# Com ajuda da IA, verifiquei que o expand=True transforma os valores separados em novas colunas.
+df = df_raw[0].str.split(",", expand=True)
 
-for linha in linhas:
-    linha = linha.strip()
+# Depois de separar os dados, atribuí os nomes para cada uma das colunas, conforme as informações presentes no arquivo:
+# ID do funcionário, nome, sobrenome, salário, departamento e cargo.
+df.columns = [
+    "EMPLOYEE_ID",
+    "FIRST_NAME",
+    "LAST_NAME",
+    "SALARY",
+    "DEPARTMENT_NAME",
+    "JOB_TITLE"
+]
 
-    # Remove as aspas externas
-    if linha.startswith('"') and linha.endswith('"'):
-        linha = linha[1:-1]
+# Percorro todas as colunas do DataFrame.
+# O objetivo é remover as aspas duplas (") que vieram junto com os valores do arquivo CSV.
+for col in df.columns:
+    df[col] = df[col].str.strip('"')
 
-    # Corrige aspas duplicadas
-    linha = linha.replace('""', '"')
+# Removendo a primeira linha do DataFrame.
+# Ela corresponde ao cabeçalho original do arquivo, que foi mantido como dado porque usei header=None na leitura.
+df = df.drop(0)
 
-    linhas_corrigidas.append(linha)
+# Convertendo a coluna SALARY de texto (string) para número.
+df["SALARY"] = pd.to_numeric(df["SALARY"])
 
-# Cria o DataFrame
-df = pd.read_csv(StringIO("\n".join(linhas_corrigidas)))
+# Salvando o DataFrame já limpo em um novo arquivo CSV.
+# Utilizei o index=False para evitar que o índice do DataFrame seja salvo como uma coluna adicional no arquivo.
+df.to_csv("dados/query_01_limpo.csv", index=False)
 
-print("Quantidade de linhas:", len(df))
-print("Quantidade de colunas:", len(df.columns))
-
-print("\nColunas:")
-print(df.columns.tolist())
-
-print("\nPrimeiras linhas:")
-print(df.head())
+# Exibindo uma mensagem no terminal informando que o arquivo foi salvo.
+print("\nArquivo limpo salvo em dados/query_01_limpo.csv")
