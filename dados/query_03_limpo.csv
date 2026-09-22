@@ -1,4 +1,4 @@
-DEPARTMENT_ID,DEPARTMENT_NAME,LOCATION_ID
+JOB_TITLE,FAIXA_SALARIAL,TOTAL_FUNCIONARIOS
 Accountant,6k - 10k,5
 Accounting Manager,Acima de 10k,1
 Administration Assistant,3k - 6k,1
