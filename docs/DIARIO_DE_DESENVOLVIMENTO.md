@@ -1,367 +1,543 @@
 # Diário de Desenvolvimento — Projeto HR BI
 
-Este documento registra o processo de desenvolvimento do projeto,
-incluindo decisões técnicas, problemas encontrados, soluções adotadas
-e aprendizados obtidos durante a construção da solução de Business
-Intelligence aplicada à área de Recursos Humanos.
+Este documento registra o processo de desenvolvimento do projeto, incluindo decisões técnicas, problemas encontrados, soluções adotadas e aprendizados obtidos durante a construção da solução de Business Intelligence aplicada à área de Recursos Humanos.
 
 ---
 
 ## 18/09/2026 — Desenvolvimento da Query 1 (Salários por Departamento e Cargo)
 
 ### Objetivo
+
 Construir a primeira consulta SQL solicitada no projeto, analisando a distribuição de salários por departamento e cargo.
 
 ### Atividades realizadas
-- Acesso ao banco FreeSQL (schema HR).
-- Criação da consulta `query_1.sql` utilizando `LEFT JOIN` entre as tabelas EMPLOYEES, DEPARTMENTS e JOBS.
-- Aplicação de filtro simples com `WHERE SALARY > 0` para garantir consistência dos dados.
-- Execução da query e validação dos resultados.
-- Exportação do resultado para o arquivo `dados/query_01.csv`.
+
+* Acesso ao banco FreeSQL (schema HR).
+* Criação da consulta `query_1.sql` utilizando `LEFT JOIN` entre as tabelas `EMPLOYEES`, `DEPARTMENTS` e `JOBS`.
+* Aplicação de filtro simples com `WHERE SALARY > 0` para garantir consistência dos dados.
+* Execução da query e validação dos resultados.
+* Exportação do resultado para o arquivo `dados/query_01.csv`.
 
 ### Estrutura da Query
-    SELECT 
-        e.employee_id,
-        e.first_name,
-        e.last_name,
-        e.salary,
-        d.department_name,
-        j.job_title
-    FROM hr.employees e
-    LEFT JOIN hr.departments d ON e.department_id = d.department_id
-    LEFT JOIN hr.jobs j ON e.job_id = j.job_id
-    WHERE e.salary > 0;
 
-### Resultado
-Arquivo `query_01.csv` gerado com 58 registros e 6 colunas.  
-Dados prontos para serem utilizados na análise exploratória em Python.
+```sql
+SELECT 
+    e.employee_id,
+    e.first_name,
+    e.last_name,
+    e.salary,
+    d.department_name,
+    j.job_title
+FROM hr.employees e
+LEFT JOIN hr.departments d ON e.department_id = d.department_id
+LEFT JOIN hr.jobs j ON e.job_id = j.job_id
+WHERE e.salary > 0;
+```
+
+### Resultado inicial
+
+Durante os testes iniciais, o arquivo `query_01.csv` apresentou 58 registros e 6 colunas.
+
+Essa etapa foi importante para validar a estrutura da consulta e iniciar os testes de importação e tratamento dos dados.
+
+Posteriormente, a extração foi revisada para representar a base completa utilizada na análise final.
 
 ### Aprendizados
-- A importância de validar a query com filtros simples para evitar registros inconsistentes.  
-- O uso de `LEFT JOIN` garantiu que todos os funcionários fossem incluídos, mesmo que alguns não tivessem departamento ou cargo associado.
 
-### Observação adicional:  
-Durante os testes iniciais, também foi utilizada a condição WHERE SALARY > 5000 ORDER BY SALARY DESC para explorar apenas os salários mais altos. Essa variação ajudou a entender melhor a distribuição dos maiores salários, mas não corresponde ao escopo oficial da Query 1.
-A versão final entregue segue o enunciado do projeto, utilizando WHERE SALARY > 0 para representar a distribuição completa dos salários por departamento e cargo, garantindo consistência nos dados exportados para o arquivo query_01.csv.
+* A importância de validar a query com filtros simples para evitar registros inconsistentes.
+* O uso de `LEFT JOIN` permite manter os funcionários na consulta mesmo quando algum relacionamento não possui correspondência.
+* A validação dos dados extraídos é fundamental antes de iniciar a análise exploratória.
+
+### Observação adicional
+
+Durante os testes iniciais, também foi utilizada a condição:
+
+```sql
+WHERE SALARY > 5000
+ORDER BY SALARY DESC
+```
+
+Essa variação foi utilizada para explorar os salários mais altos, mas não corresponde ao escopo oficial da Query 1.
+
+A versão final utiliza `WHERE SALARY > 0`, permitindo representar a distribuição completa dos salários utilizada na análise.
+
 ---
 
 ## 21/09/2026 — Configuração inicial do projeto
 
 ### Objetivo
+
 Preparar o ambiente de desenvolvimento para iniciar a análise dos dados de Recursos Humanos utilizando Python e Pandas.
 
 ### Atividades realizadas
-- Estruturação inicial do projeto `Projeto_HR_BI`.
-- Criação do ambiente virtual `.venv`.
-- Ativação do ambiente virtual.
-- Instalação da biblioteca Pandas.
-- Criação do script `src/analisar_dados.py`.
-- Identificação do arquivo de dados `dados/query_01.csv`.
+
+* Estruturação inicial do projeto `Projeto_HR_BI`.
+* Criação do ambiente virtual `.venv`.
+* Ativação do ambiente virtual.
+* Instalação da biblioteca Pandas.
+* Criação do script `src/analisar_dados.py`.
+* Identificação dos arquivos de dados na pasta `dados/`.
 
 ### Ambiente utilizado
-- Python  
-- Pandas  
-- Visual Studio Code  
-- PowerShell  
-- Ambiente virtual Python (`.venv`)
+
+* Python
+* Pandas
+* Visual Studio Code
+* PowerShell
+* Ambiente virtual Python (`.venv`)
 
 ---
 
 ## 21/09/2026 — Primeiro teste de leitura dos dados
 
 ### Objetivo
+
 Realizar a leitura do arquivo CSV utilizando o Pandas e verificar sua estrutura.
 
 ### Código inicial
-    df = pd.read_csv(arquivo)
+
+```python
+df = pd.read_csv(arquivo)
+```
 
 ### Resultado inicial
-O arquivo foi carregado, porém os dados não foram interpretados corretamente.  
 
-- 58 linhas  
-- 58 colunas identificadas pelo código  
-- Apenas uma coluna aparecia na lista de nomes das colunas  
+O arquivo foi carregado, porém os dados não foram interpretados corretamente.
 
-Saída:
-    ['EMPLOYEE_ID,"FIRST_NAME","LAST_NAME","SALARY","DEPARTMENT_NAME","JOB_TITLE"']
+Durante o primeiro teste, foram identificados problemas na interpretação das colunas e dos registros.
+
+A lista de colunas retornada pelo Pandas apresentava todo o cabeçalho como uma única coluna:
+
+```text
+['EMPLOYEE_ID,"FIRST_NAME","LAST_NAME","SALARY","DEPARTMENT_NAME","JOB_TITLE"']
+```
 
 ### Problema identificado
+
 Os dados deveriam possuir seis campos:
-- EMPLOYEE_ID  
-- FIRST_NAME  
-- LASTNAME  
-- SALARY  
-- DEPARTMENT_NAME  
-- JOB_TITLE  
+
+* `EMPLOYEE_ID`
+* `FIRST_NAME`
+* `LAST_NAME`
+* `SALARY`
+* `DEPARTMENT_NAME`
+* `JOB_TITLE`
 
 Porém, o Pandas estava interpretando cada linha de forma incorreta.
 
 ---
 
-### Investigação da estrutura do CSV
-Com a ajuda da IA, foi utilizado o comando:
-    Get-Content dados\query_01.csv -TotalCount 2
+## 21/09/2026 — Investigação da estrutura do CSV
 
-**Resultado:**  
+### Objetivo
+
+Identificar a causa do problema de leitura apresentado pelo Pandas.
+
+### Procedimento realizado
+
+Foi utilizado o comando:
+
+```powershell
+Get-Content dados\query_01.csv -TotalCount 2
+```
+
+### Resultado
+
 Foi identificada uma estrutura de aspas diferente do formato CSV convencional:
-    "EMPLOYEE_ID,""FIRST_NAME"",""LAST_NAME"",""SALARY"",""DEPARTMENT_NAME"",""JOB_TITLE"""
+
+```text
+"EMPLOYEE_ID,""FIRST_NAME"",""LAST_NAME"",""SALARY"",""DEPARTMENT_NAME"",""JOB_TITLE"""
+```
 
 Também foi identificado que os campos estavam separados por vírgulas.
 
 ### Conclusão
-O problema estava relacionado à formatação do arquivo de origem, principalmente à forma como as aspas estavam estruturadas.
+
+O problema estava relacionado principalmente à formatação do arquivo de origem e à maneira como as aspas estavam estruturadas.
+
+Essa investigação mostrou a importância de verificar o arquivo original antes de modificar o código de leitura.
 
 ---
 
 ## 21/09/2026 — Tratamento da leitura do CSV
 
 ### Objetivo
-Corrigir a interpretação dos dados antes de iniciar a análise.
+
+Corrigir a interpretação dos dados antes de iniciar a análise exploratória.
 
 ### Tentativa inicial
-    pd.read_csv(arquivo, sep=",")
 
-Porém, apenas informar o separador não foi suficiente para corrigir completamente a estrutura das aspas do arquivo.
+```python
+pd.read_csv(arquivo, sep=",")
+```
+
+Apenas informar o separador não foi suficiente para corrigir completamente a estrutura das aspas do arquivo.
 
 ### Solução implementada
-    with open(arquivo, "r", encoding="utf-8") as f:
-        linhas = f.readlines()
 
-    linhas_corrigidas = []
+Foi realizado um tratamento prévio do conteúdo do arquivo antes da leitura com Pandas:
 
-    for linha in linhas:
-        linha = linha.strip()
+```python
+with open(arquivo, "r", encoding="utf-8") as f:
+    linhas = f.readlines()
 
-        if linha.startswith('"') and linha.endswith('"'):
-            linha = linha[1:-1]
+linhas_corrigidas = []
 
-        linha = linha.replace('""', '"')
+for linha in linhas:
+    linha = linha.strip()
 
-        linhas_corrigidas.append(linha)
+    if linha.startswith('"') and linha.endswith('"'):
+        linha = linha[1:-1]
 
-    df = pd.read_csv(StringIO("\n".join(linhas_corrigidas)))
+    linha = linha.replace('""', '"')
+    linhas_corrigidas.append(linha)
+
+df = pd.read_csv(StringIO("\n".join(linhas_corrigidas)))
+```
 
 ---
 
-## Validação da estrutura dos dados
+## 21/09/2026 — Validação da estrutura dos dados
+
 Após o tratamento, o DataFrame passou a apresentar a estrutura esperada.
 
-**Resultado:**
-- Quantidade de linhas: 58  
-- Quantidade de colunas: 6  
+### Resultado
+
+* Quantidade de linhas no primeiro arquivo analisado: 58
+* Quantidade de colunas: 6
 
 Colunas identificadas:
-- EMPLOYEE_ID  
-- FIRST_NAME  
-- LASTNAME  
-- SALARY  
-- DEPARTMENT_NAME  
-- JOB_TITLE  
 
-Correção aplicada:
-    len(df.columns)
+* `EMPLOYEE_ID`
+* `FIRST_NAME`
+* `LAST_NAME`
+* `SALARY`
+* `DEPARTMENT_NAME`
+* `JOB_TITLE`
 
-**Resultado final da validação:**
-- Quantidade de linhas: 58  
-- Quantidade de colunas: 6  
-- [5 rows x 6 columns]
+Foi utilizada a validação:
+
+```python
+len(df.columns)
+```
+
+### Aprendizados desta etapa
+
+* Importância de verificar a estrutura real dos dados antes de iniciar uma análise.
+* Problemas de importação podem estar relacionados ao arquivo de origem e não necessariamente ao Pandas.
+* A inspeção direta do arquivo ajudou a identificar a causa do problema.
+* É importante validar o DataFrame após a importação, verificando:
+
+  * quantidade de registros;
+  * quantidade de colunas;
+  * nomes das colunas;
+  * primeiras linhas dos dados.
+
+Essa validação evita iniciar análises sobre uma estrutura incorreta.
 
 ---
-
-## Situação atual
-A etapa de carregamento e validação inicial dos dados foi concluída.  
-
-O conjunto possui:
-- 58 registros  
-- 6 atributos  
-- Identificação do funcionário  
-- Nome e sobrenome  
-- Salário  
-- Departamento  
-- Cargo  
-
----
-
-## Aprendizados desta etapa
-- Importância de verificar a estrutura real dos dados antes de iniciar uma análise.  
-- Problemas podem parecer relacionados ao Pandas ou ao separador, mas a inspeção direta do arquivo revelou que a origem estava na formatação do CSV.  
-- Necessidade de validar o DataFrame após a importação:
-  - Quantidade de registros  
-  - Quantidade de colunas  
-  - Nomes das colunas  
-  - Primeiras linhas dos dados  
-
-Essa validação evita iniciar análises sobre uma estrutura de dados incorreta.
 
 ## 21/09/2026 — Desenvolvimento da Query 2 (Funcionários por Região e Localização)
 
 ### Objetivo
-Analisar a distribuição de funcionários por região, incluindo informações de localização (cidade, estado, país e região).
+
+Analisar a distribuição de funcionários por região, incluindo informações de localização como cidade, estado, país e região.
 
 ### Atividades realizadas
-- Acesso ao banco FreeSQL (schema HR).
-- Criação da consulta `query_2.sql` utilizando múltiplos `LEFT JOIN` entre EMPLOYEES, DEPARTMENTS, LOCATIONS, COUNTRIES e REGIONS.
-- Aplicação de filtro simples para garantir consistência dos dados.
-- Execução da query e validação dos resultados.
-- Exportação do resultado para o arquivo `dados/query_02.csv`.
+
+* Acesso ao banco FreeSQL (schema HR).
+* Criação da consulta `query_2.sql`.
+* Utilização de múltiplos `LEFT JOIN` entre `EMPLOYEES`, `DEPARTMENTS`, `LOCATIONS`, `COUNTRIES` e `REGIONS`.
+* Aplicação de filtro para garantir consistência dos dados.
+* Execução da query e validação dos resultados.
+* Exportação do resultado para `dados/query_02.csv`.
 
 ### Estrutura da Query
-    SELECT 
-        e.employee_id,
-        e.first_name,
-        e.last_name,
-        e.salary,
-        d.department_name,
-        l.city,
-        l.state_province,
-        c.country_name,
-        r.region_name
-    FROM hr.employees e
-    LEFT JOIN hr.departments d ON e.department_id = d.department_id
-    LEFT JOIN hr.locations l ON d.location_id = l.location_id
-    LEFT JOIN hr.countries c ON l.country_id = c.country_id
-    LEFT JOIN hr.regions r ON c.region_id = r.region_id
-    WHERE r.region_name IS NOT NULL;
+
+```sql
+SELECT 
+    e.employee_id,
+    e.first_name,
+    e.last_name,
+    e.salary,
+    d.department_name,
+    l.city,
+    l.state_province,
+    c.country_name,
+    r.region_name
+FROM hr.employees e
+LEFT JOIN hr.departments d ON e.department_id = d.department_id
+LEFT JOIN hr.locations l ON d.location_id = l.location_id
+LEFT JOIN hr.countries c ON l.country_id = c.country_id
+LEFT JOIN hr.regions r ON c.region_id = r.region_id
+WHERE r.region_name IS NOT NULL;
+```
 
 ### Resultado
-Arquivo `query_02.csv` gerado com registros contendo informações de funcionários, departamentos e localização completa (cidade, estado, país e região).  
-Dados prontos para análise exploratória em Python.
+
+O arquivo `query_02.csv` foi gerado contendo informações de funcionários, departamentos e localização completa.
+
+Os dados ficaram preparados para a etapa de análise exploratória em Python.
 
 ### Aprendizados
-- A importância de relacionar múltiplas tabelas para enriquecer a análise com informações geográficas.  
-- O uso de `LEFT JOIN` garantiu que todos os funcionários fossem incluídos, mesmo que alguns não tenham localização detalhada.  
-- O filtro `WHERE r.region_name IS NOT NULL` assegurou consistência nos dados exportados.
 
-## 21/09/2026 – Desenvolvimento da Query 3 (Funcionários por Cargo e Faixa Salarial)
+* A utilização de múltiplos relacionamentos permite enriquecer uma análise com informações geográficas.
+* O uso de `LEFT JOIN` possibilita preservar os registros da tabela principal.
+* O filtro `WHERE r.region_name IS NOT NULL` ajudou a garantir consistência dos dados utilizados na análise.
+
+---
+
+## 21/09/2026 — Desenvolvimento da Query 3 (Funcionários por Cargo e Faixa Salarial)
+
+### Objetivo
+
+Criar uma análise complementar para identificar a distribuição dos funcionários de acordo com o cargo e a faixa salarial.
+
+### Atividades realizadas
+
+* Criação da consulta `query_3.sql`.
+* Utilização das tabelas `EMPLOYEES` e `JOBS`.
+* Criação das faixas salariais utilizando `CASE WHEN`.
+* Contagem dos funcionários por cargo e faixa salarial.
+* Organização dos resultados por cargo e faixa salarial.
+* Exportação dos resultados para CSV.
+
 ### Aprendizados
-- O uso de `CASE WHEN` permitiu agrupar salários em faixas, facilitando a análise da distribuição salarial.
-- A junção com a tabela `HR.JOBS` trouxe insights sobre como diferentes cargos se concentram em determinadas faixas de remuneração.
-- A ordenação por cargo e faixa salarial deixou os resultados mais organizados e claros para interpretação.
+
+* O uso de `CASE WHEN` permitiu transformar valores salariais em categorias, facilitando a análise.
+* A utilização da tabela `JOBS` permitiu relacionar os cargos às respectivas faixas salariais.
+* A organização dos resultados por cargo e faixa tornou a análise mais clara.
+
+---
 
 ## 22/09/2026 — Análise Exploratória da Query 1 (EDA em Python)
+
 ### Objetivo
-Explorar os dados da Query 1 utilizando Pandas e Matplotlib para identificar padrões salariais.
+
+Explorar os dados da Query 1 utilizando Pandas e Matplotlib para identificar padrões relacionados aos salários e departamentos.
 
 ### Atividades realizadas
-Leitura do arquivo query_01_limpo.csv.
 
-Cálculo de estatísticas descritivas (média, mediana, mínimo e máximo).
+* Leitura do arquivo tratado da Query 1.
+* Limpeza e preparação dos dados.
+* Cálculo de estatísticas descritivas.
+* Cálculo de média, mediana, salário mínimo e salário máximo.
+* Contagem de funcionários por departamento.
+* Criação de histograma dos salários.
+* Criação de boxplot dos salários por departamento.
+* Exportação dos gráficos para a pasta `graficos/`.
 
-Contagem de funcionários por departamento.
+### Resultado final da análise
 
-Criação de gráficos: histograma de salários e boxplot por departamento.
+* **Média salarial:** R$ 6.461,83
+* **Mediana salarial:** R$ 6.200,00
+* **Menor salário:** R$ 2.100,00
+* **Maior salário:** R$ 24.000,00
 
-Exportação dos gráficos para a pasta graficos/.
+Os departamentos com maior quantidade de funcionários foram:
 
-### Resultado
-Média salarial: 6461,83
+* **Shipping:** 45
+* **Sales:** 34
 
-Mediana salarial: 6200
+### Gráficos gerados
 
-Faixa salarial entre 2100 e 24000.
-
-Departamentos com maior número de funcionários: Shipping (45) e Sales (34).
-
-Gráficos salvos em graficos/query1_salarios_histograma.png e graficos/query1_salarios_boxplot.png.
+```text
+graficos/query1_salarios_histograma.png
+graficos/query1_salarios_boxplot.png
+```
 
 ### Aprendizados
-A visualização gráfica facilita a interpretação dos dados.
 
-O boxplot evidenciou diferenças significativas entre departamentos.
+* A estatística descritiva permite compreender rapidamente a distribuição dos salários.
+* O histograma facilita a visualização da concentração dos valores.
+* O boxplot permite comparar a distribuição salarial entre departamentos e identificar diferenças e possíveis valores extremos.
+
+---
 
 ## 22/09/2026 — Análise Exploratória da Query 2 (Funcionários por Região)
+
 ### Objetivo
-Explorar os dados da Query 2 para entender a distribuição de funcionários por localização.
+
+Explorar os dados da Query 2 para compreender a distribuição dos funcionários entre as regiões geográficas.
 
 ### Atividades realizadas
-Limpeza do arquivo query_02.csv.
 
-Contagem de funcionários por região (Americas e Europe).
-
-Criação de gráfico de barras mostrando a distribuição.
-
-Exportação do gráfico para a pasta graficos/.
+* Limpeza e preparação do arquivo `query_02.csv`.
+* Contagem de funcionários por região.
+* Análise da distribuição entre as regiões.
+* Criação de gráfico de barras.
+* Exportação do gráfico para a pasta `graficos/`.
 
 ### Resultado
-Americas: 70 funcionários.
 
-Europe: 36 funcionários.
+A distribuição encontrada foi:
 
-Gráfico salvo em graficos/query2_regioes.png.
+* **Americas:** 70 funcionários.
+* **Europe:** 36 funcionários.
+
+### Gráfico gerado
+
+```text
+graficos/query2_regioes.png
+```
 
 ### Aprendizados
-A integração de múltiplas tabelas enriqueceu a análise com dados geográficos.
 
-A predominância da região Americas reflete a concentração da base de dados.
+* A integração entre diferentes tabelas permitiu ampliar a análise com informações geográficas.
+* O gráfico de barras facilitou a comparação da quantidade de funcionários entre as regiões.
+* A análise evidenciou uma maior concentração de funcionários na região Americas dentro da base analisada.
 
-## 22/09/2026 — Análise Exploratória da Query 3 (Faixas Salariais por Cargo)
+---
+
+## 22/09/2026 — Análise Exploratória da Query 3 (Funcionários por Cargo e Faixa Salarial)
+
 ### Objetivo
-Explorar os dados da Query 3 para identificar a distribuição de funcionários por faixa salarial.
+
+Explorar os dados da Query 3 para identificar a distribuição dos funcionários entre as diferentes faixas salariais e cargos.
 
 ### Atividades realizadas
-Limpeza do arquivo query_03.csv.
 
-Contagem de funcionários por faixa salarial.
+* Limpeza e preparação do arquivo `query_03.csv`.
+* Contagem de funcionários por faixa salarial.
+* Análise da distribuição entre as faixas.
+* Identificação dos cargos com maior quantidade de funcionários.
+* Criação de gráfico de barras.
+* Exportação do gráfico para a pasta `graficos/`.
 
-Criação de gráfico de barras mostrando a predominância das faixas.
+### Resultado final
 
-Exportação do gráfico para a pasta graficos/.
+A distribuição dos 107 funcionários entre as faixas salariais foi:
 
-### Resultado
-Faixa acima de 10k: 8 funcionários.
+* **6k - 10k:** 40 funcionários.
+* **3k - 6k:** 26 funcionários.
+* **Até 3k:** 26 funcionários.
+* **Acima de 10k:** 15 funcionários.
 
-Faixa entre 6k–10k: 7 funcionários.
+O cargo com maior quantidade de funcionários foi:
 
-Faixa entre 3k–6k: 7 funcionários.
+* **Sales Representative:** 30 funcionários.
 
-Faixa até 3k: 3 funcionários.
+### Gráfico gerado
 
-Gráfico salvo em graficos/query3_departamentos.png.
+```text
+graficos/query3_funcionarios_cargo_faixa.png
+```
 
 ### Aprendizados
-O uso de CASE WHEN na query SQL foi essencial para agrupar salários.
 
-A análise mostrou concentração em faixas mais altas, indicando cargos de maior responsabilidade.
+* O `CASE WHEN` utilizado na consulta SQL facilitou a criação das categorias salariais.
+* A análise conjunta de cargo e faixa salarial permitiu uma visão mais detalhada da distribuição dos funcionários.
+* A representação gráfica tornou mais clara a comparação entre cargos e faixas de remuneração.
 
-## 22/09/2026 — Versionamento com GitHub (Branches e Commits)
+---
+
+## 22/09/2026 — Organização da documentação do projeto
+
 ### Objetivo
-Organizar o histórico do projeto utilizando Git e GitHub.
+
+Documentar de forma clara o desenvolvimento e os resultados obtidos durante o projeto.
 
 ### Atividades realizadas
-Criação de branches para cada etapa (feature/query1-eda, feature/query2-eda, feature/query3-eda).
 
-Commits com mensagens descritivas.
-
-Merge das branches na main.
-
-Organização da estrutura de pastas (src/, dados/, graficos/, docs/).
+* Revisão do `README.md`.
+* Organização das seções de objetivo, etapas, modelagem, resultados e gráficos.
+* Inclusão da estrutura de pastas do projeto.
+* Inclusão das tecnologias e ferramentas utilizadas.
+* Inclusão das instruções para execução do projeto.
+* Inclusão do link para o Diário de Desenvolvimento.
+* Revisão das sugestões de melhoria.
+* Revisão da conclusão do projeto.
 
 ### Resultado
-Repositório organizado e pronto para entrega, com histórico claro de evolução.
+
+O README passou a apresentar de forma organizada:
+
+* objetivo do projeto;
+* consultas desenvolvidas;
+* estrutura dos dados;
+* resultados das análises;
+* gráficos;
+* estrutura de pastas;
+* tecnologias utilizadas;
+* instruções de execução;
+* referência ao Diário de Desenvolvimento;
+* possibilidades de evolução do projeto.
 
 ### Aprendizados
-O uso de branches facilita o desenvolvimento incremental.
 
-Commits bem descritos tornam o projeto mais profissional e fácil de acompanhar.
+A documentação é uma parte importante do projeto, pois permite que outra pessoa compreenda a finalidade da solução, as ferramentas utilizadas, o processo de desenvolvimento e os resultados obtidos.
+
+---
+
+## 22/09/2026 — Versionamento com Git e GitHub
+
+### Objetivo
+
+Organizar e registrar a evolução do projeto utilizando Git e GitHub.
+
+### Atividades realizadas
+
+* Organização dos arquivos do projeto.
+* Estruturação das pastas `src/`, `dados/`, `graficos/`, `sql/` e `docs/`.
+* Utilização de commits com mensagens descritivas.
+* Organização do histórico do projeto.
+* Atualização dos arquivos no repositório remoto.
+* Revisão do estado da branch `main`.
+* Atualização do README no GitHub.
+
+### Resultado
+
+O projeto ficou organizado e versionado no GitHub, com os arquivos necessários para a entrega e documentação do desenvolvimento.
+
+### Aprendizados
+
+* O Git permite acompanhar as alterações realizadas durante o desenvolvimento.
+* Commits com mensagens claras facilitam a compreensão do histórico.
+* O GitHub permite disponibilizar o projeto de forma organizada e facilita sua apresentação e avaliação.
 
 ### Observação adicional
-O vídeo explicativo do projeto foi gravado e será enviado separadamente pelo sistema AVA do SENAI, conforme exigências da entrega.
+
+O vídeo explicativo do projeto foi gravado e será enviado separadamente pelo sistema AVA do SENAI, conforme as exigências da entrega.
+
+---
 
 ## 22/09/2026 — Encerramento do Projeto
+
 ### Objetivo
-Finalizar o desenvolvimento e validar se todas as exigências do Projeto Avaliativo – Módulo 1 foram contempladas.
+
+Finalizar o desenvolvimento e validar se as exigências do Projeto Avaliativo – Módulo 1 foram contempladas.
 
 ### Atividades realizadas
-Revisão das queries SQL e dos arquivos CSV gerados.
 
-Conferência das análises exploratórias (EDA) com gráficos salvos na pasta graficos/.
+* Revisão das queries SQL.
+* Revisão dos arquivos CSV utilizados nas análises.
+* Conferência das análises exploratórias.
+* Conferência dos gráficos gerados.
+* Organização da estrutura de pastas.
+* Revisão e atualização do `README.md`.
+* Atualização do Diário de Desenvolvimento.
+* Validação do versionamento no GitHub.
+* Conferência da branch `main`.
+* Conferência dos arquivos necessários para a entrega.
 
-Organização da estrutura de pastas (src, dados, graficos, sql, docs).
+### Entregáveis finais
 
-Criação e atualização do arquivo README.md com objetivos, etapas, resultados e referência ao Diário de Desenvolvimento.
+O projeto contém:
 
-Validação do versionamento no GitHub (branches, commits descritivos e merge na main).
+* Queries SQL das três análises.
+* Arquivos de dados utilizados.
+* Código Python para tratamento e análise dos dados.
+* Gráficos das análises exploratórias.
+* README com documentação do projeto.
+* Diário de Desenvolvimento.
+* Versionamento utilizando Git e GitHub.
 
 ### Conclusão
-O projeto foi concluído em 22/09/2026, atendendo integralmente às exigências do módulo.
-A entrega final inclui queries SQL, tratamento dos dados, análises exploratórias com gráficos, documentação completa e versionamento profissional no GitHub.
+
+O projeto foi concluído em **22/09/2026**, contemplando as etapas de extração dos dados, tratamento, análise exploratória, visualização e documentação.
+
+Durante o desenvolvimento foram trabalhados conceitos de SQL, relacionamentos entre tabelas, tratamento de arquivos CSV, Python, Pandas, Matplotlib, análise exploratória de dados, Git e GitHub.
+
+Além dos resultados obtidos nas três consultas, o projeto proporcionou a experiência prática de identificar problemas nos dados, investigar suas causas, implementar soluções e documentar todo o processo de desenvolvimento.
+
+O projeto também apresenta possibilidades de evolução, como a criação de um dashboard interativo em Power BI, inclusão de novos indicadores e automatização da atualização dos dados.
