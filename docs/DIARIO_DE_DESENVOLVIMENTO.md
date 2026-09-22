@@ -193,7 +193,7 @@ O conjunto possui:
 
 Essa validação evita iniciar análises sobre uma estrutura de dados incorreta.
 
-## 25/09/2026 — Desenvolvimento da Query 2 (Funcionários por Região e Localização)
+## 21/09/2026 — Desenvolvimento da Query 2 (Funcionários por Região e Localização)
 
 ### Objetivo
 Analisar a distribuição de funcionários por região, incluindo informações de localização (cidade, estado, país e região).
@@ -237,3 +237,131 @@ Dados prontos para análise exploratória em Python.
 - O uso de `CASE WHEN` permitiu agrupar salários em faixas, facilitando a análise da distribuição salarial.
 - A junção com a tabela `HR.JOBS` trouxe insights sobre como diferentes cargos se concentram em determinadas faixas de remuneração.
 - A ordenação por cargo e faixa salarial deixou os resultados mais organizados e claros para interpretação.
+
+## 22/09/2026 — Análise Exploratória da Query 1 (EDA em Python)
+### Objetivo
+Explorar os dados da Query 1 utilizando Pandas e Matplotlib para identificar padrões salariais.
+
+### Atividades realizadas
+Leitura do arquivo query_01_limpo.csv.
+
+Cálculo de estatísticas descritivas (média, mediana, mínimo e máximo).
+
+Contagem de funcionários por departamento.
+
+Criação de gráficos: histograma de salários e boxplot por departamento.
+
+Exportação dos gráficos para a pasta graficos/.
+
+### Resultado
+Média salarial: 6461,83
+
+Mediana salarial: 6200
+
+Faixa salarial entre 2100 e 24000.
+
+Departamentos com maior número de funcionários: Shipping (45) e Sales (34).
+
+Gráficos salvos em graficos/query1_salarios_histograma.png e graficos/query1_salarios_boxplot.png.
+
+### Aprendizados
+A visualização gráfica facilita a interpretação dos dados.
+
+O boxplot evidenciou diferenças significativas entre departamentos.
+
+## 22/09/2026 — Análise Exploratória da Query 2 (Funcionários por Região)
+### Objetivo
+Explorar os dados da Query 2 para entender a distribuição de funcionários por localização.
+
+### Atividades realizadas
+Limpeza do arquivo query_02.csv.
+
+Contagem de funcionários por região (Americas e Europe).
+
+Criação de gráfico de barras mostrando a distribuição.
+
+Exportação do gráfico para a pasta graficos/.
+
+### Resultado
+Americas: 70 funcionários.
+
+Europe: 36 funcionários.
+
+Gráfico salvo em graficos/query2_regioes.png.
+
+### Aprendizados
+A integração de múltiplas tabelas enriqueceu a análise com dados geográficos.
+
+A predominância da região Americas reflete a concentração da base de dados.
+
+## 22/09/2026 — Análise Exploratória da Query 3 (Faixas Salariais por Cargo)
+### Objetivo
+Explorar os dados da Query 3 para identificar a distribuição de funcionários por faixa salarial.
+
+### Atividades realizadas
+Limpeza do arquivo query_03.csv.
+
+Contagem de funcionários por faixa salarial.
+
+Criação de gráfico de barras mostrando a predominância das faixas.
+
+Exportação do gráfico para a pasta graficos/.
+
+### Resultado
+Faixa acima de 10k: 8 funcionários.
+
+Faixa entre 6k–10k: 7 funcionários.
+
+Faixa entre 3k–6k: 7 funcionários.
+
+Faixa até 3k: 3 funcionários.
+
+Gráfico salvo em graficos/query3_departamentos.png.
+
+### Aprendizados
+O uso de CASE WHEN na query SQL foi essencial para agrupar salários.
+
+A análise mostrou concentração em faixas mais altas, indicando cargos de maior responsabilidade.
+
+## 22/09/2026 — Versionamento com GitHub (Branches e Commits)
+### Objetivo
+Organizar o histórico do projeto utilizando Git e GitHub.
+
+### Atividades realizadas
+Criação de branches para cada etapa (feature/query1-eda, feature/query2-eda, feature/query3-eda).
+
+Commits com mensagens descritivas.
+
+Merge das branches na main.
+
+Organização da estrutura de pastas (src/, dados/, graficos/, docs/).
+
+### Resultado
+Repositório organizado e pronto para entrega, com histórico claro de evolução.
+
+### Aprendizados
+O uso de branches facilita o desenvolvimento incremental.
+
+Commits bem descritos tornam o projeto mais profissional e fácil de acompanhar.
+
+### Observação adicional
+O vídeo explicativo do projeto foi gravado e será enviado separadamente pelo sistema AVA do SENAI, conforme exigências da entrega.
+
+## 22/09/2026 — Encerramento do Projeto
+### Objetivo
+Finalizar o desenvolvimento e validar se todas as exigências do Projeto Avaliativo – Módulo 1 foram contempladas.
+
+### Atividades realizadas
+Revisão das queries SQL e dos arquivos CSV gerados.
+
+Conferência das análises exploratórias (EDA) com gráficos salvos na pasta graficos/.
+
+Organização da estrutura de pastas (src, dados, graficos, sql, docs).
+
+Criação e atualização do arquivo README.md com objetivos, etapas, resultados e referência ao Diário de Desenvolvimento.
+
+Validação do versionamento no GitHub (branches, commits descritivos e merge na main).
+
+### Conclusão
+O projeto foi concluído em 22/09/2026, atendendo integralmente às exigências do módulo.
+A entrega final inclui queries SQL, tratamento dos dados, análises exploratórias com gráficos, documentação completa e versionamento profissional no GitHub.
