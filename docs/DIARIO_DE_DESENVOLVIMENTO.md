@@ -135,7 +135,7 @@ Identificar a causa do problema de leitura apresentado pelo Pandas.
 
 ### Procedimento realizado
 
-Foi utilizado o comando:
+Com a ajuda da IA, foi utilizado o comando:
 
 ```powershell
 Get-Content dados\query_01.csv -TotalCount 2
@@ -175,7 +175,7 @@ Apenas informar o separador não foi suficiente para corrigir completamente a es
 
 ### Solução implementada
 
-Foi realizado um tratamento prévio do conteúdo do arquivo antes da leitura com Pandas:
+Com a ajuda da IA, foi realizado um tratamento prévio do conteúdo do arquivo antes da leitura com Pandas:
 
 ```python
 with open(arquivo, "r", encoding="utf-8") as f:
@@ -532,9 +532,25 @@ O projeto contém:
 * Diário de Desenvolvimento.
 * Versionamento utilizando Git e GitHub.
 
+## 23/09/2026 — Ajustes finais e encerramento do projeto
+
+Nesta data foram realizados os ajustes finais na documentação do projeto, principalmente no README.md e no DIARIO_DE_DESENVOLVIMENTO.md, com o objetivo de revisar as informações apresentadas, melhorar a organização do conteúdo e garantir que a documentação estivesse de acordo com o desenvolvimento realizado.
+
+Também foi realizada uma revisão final da estrutura do projeto e dos principais entregáveis, incluindo:
+
+consultas SQL desenvolvidas;
+arquivos de dados utilizados nas análises;
+código Python para tratamento e análise dos dados;
+gráficos gerados;
+README.md;
+DIARIO_DE_DESENVOLVIMENTO.md;
+organização e versionamento do projeto no GitHub.
+
+Após os ajustes e a revisão final, o projeto foi considerado concluído.
+
 ### Conclusão
 
-O projeto foi concluído em **22/09/2026**, contemplando as etapas de extração dos dados, tratamento, análise exploratória, visualização e documentação.
+O projeto foi concluído em **23/09/2026**, contemplando as etapas de extração dos dados, tratamento, análise exploratória, visualização e documentação.
 
 Durante o desenvolvimento foram trabalhados conceitos de SQL, relacionamentos entre tabelas, tratamento de arquivos CSV, Python, Pandas, Matplotlib, análise exploratória de dados, Git e GitHub.
 
